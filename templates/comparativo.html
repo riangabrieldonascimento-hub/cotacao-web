@@ -431,7 +431,7 @@
                 <span class="badge bg-success fs-6 px-3 py-2 me-2">
                     <i class="bi bi-check-circle-fill me-1"></i> Cotação aprovada
                 </span>
-                {% if cotacao.status == 'APROVADO' and current_user.perfil == 'gestor' %}
+                {% if cotacao.status in ['APROVADO', 'REPROVADO'] and current_user.perfil == 'gestor' %}
                 <form action="{{ url_for('retornar_para_aguardando', cotacao_id=cotacao.id) }}"
                       method="POST"
                       class="d-inline">
@@ -449,9 +449,6 @@
                 </span>
                 {% endif %}
 
-                <button onclick="window.print()" class="btn btn-light rounded-pill px-4 fw-bold shadow-sm me-2">
-                    <i class="bi bi-printer me-2"></i>Imprimir
-                </button>
 
                 <a href="{{ url_for('visualizar_cotacao', cotacao_id=cotacao.id) }}"
                    class="btn btn-outline-light rounded-pill px-4">

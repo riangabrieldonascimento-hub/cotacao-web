@@ -661,7 +661,7 @@ def retornar_para_aguardando(cotacao_id):
 
     status_atual = normalizar_status(cotacao.status)
 
-    if status_atual != STATUS_APROVADO:
+    if status_atual not in [STATUS_APROVADO, STATUS_REPROVADO]:
 
         flash(
             f'Esta cotação não está aprovada. Status atual: {status_atual}',
