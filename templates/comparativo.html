@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comparativo Final - {{ cotacao.numero }}</title>
+    <!-- Bootstrap 5.3.3 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        :root {
+            --primary-dark: #1e293b;
+            --secondary-slate: #64748b;
+            --success-green: #16a34a;
+            --bg-light: #f8fafc;
+            --border-color: #e2e8f0;
+        }
+
+        body { 
+            background-color: #f1f5f9; 
+            font-family: 'Inter', sans-serif; 
+            color: #334155; 
+            line-height: 1.6;
+        }
+
+        /* Header Estilizado */
+        .header-gradient { 
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); 
+            color: white; 
+            padding: 2.5rem 0; 
+            margin-bottom: 2rem; 
+            border-radius: 0 0 24px 24px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        /* Cards de Fornecedores */
+        .card-comparison { 
+            border: none; 
+            border-radius: 16px; 
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06); 
+            background: white; 
+            margin-bottom: 2.5rem; 
+            overflow: hidden; 
+        }
+
+        .vendor-header { 
+            padding: 1.25rem 2rem; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            border-bottom: 1px solid var(--border-color);
+            background-color: #fff;
+        }
+
+        .vendor-name { 
+            font-weight: 800; 
+            font-size: 1.35rem; 
+            color: var(--primary-dark); 
+            margin: 0; 
+        }
+
+        /* Badges e Status */
+        .winner-badge { 
+            background: #dcfce7; 
+            color: #15803d; 
+            padding: 0.6rem 1.2rem; 
+            border-radius: 12px; 
+            font-weight: 700; 
+            font-size: 0.85rem; 
+            display: flex; 
+            align-items: center; 
+            gap: 8px; 
+            border: 1px solid #bbf7d0;
+        }
+
+        /* Tabela de Comparação */
+        .table-comparison thead th { 
+            background: var(--bg-light); 
+            color: var(--secondary-slate); 
+            font-size: 0.75rem; 
+            text-transform: uppercase; 
+            letter-spacing: 0.05em; 
+            padding: 1rem; 
+            border: none;
+            font-weight: 700;
+        }
+
+        .table-comparison tbody td { 
+            padding: 1rem; 
+            border-bottom: 1px solid #f1f5f9; 
+            vertical-align: middle; 
+        }
+
+        .price-tag { font-weight: 700; color: #0f172a; font-size: 1.05rem; }
+        .tax-tag { font-size: 0.8rem; color: #64748b; display: block; }
+        
+        /* Rodapé do Card (Resumo) */
+        .total-row { 
+            background: #f8fafc; 
+            padding: 1.5rem 2rem; 
+            border-top: 1px solid var(--border-color);
+        }
+
+        .summary-box { 
+            background: white; 
+            border-radius: 12px; 
+            padding: 1rem 1.25rem; 
+            border: 1px solid var(--border-color);
+            height: 100%;
+        }
+
+        .summary-label { 
+            font-size: 0.75rem; 
+            font-weight: 700; 
+            color: var(--secondary-slate); 
+            text-transform: uppercase; 
+            margin-bottom: 0.25rem; 
+        }
+
+        .summary-value { 
+            font-size: 1.25rem; 
+            font-weight: 800; 
+            color: var(--primary-dark); 
+        }
+
+        .grand-total { 
+            color: var(--success-green); 
+            font-size: 2.25rem; 
+            font-weight: 900;
+            letter-spacing: -0.02em;
+        }
+
+        /* Ranking Lateral ou Topo */
+        .ranking-card { 
+            background: white; 
+            border-radius: 16px; 
+            padding: 1.5rem; 
+            border: 1px solid var(--border-color);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .ranking-item { 
+            display: flex; 
+            align-items: center; 
+            gap: 12px; 
+            padding: 12px; 
+            border-radius: 12px;
+            margin-bottom: 8px;
+            border: 1px solid transparent;
+        }
+
+        .ranking-item.first {
+            background: #f0fdf4;
+            border-color: #bbf7d0;
+        }
+
+        .ranking-number { 
+            width: 28px; 
+            height: 28px; 
+            background: #e2e8f0; 
+            border-radius: 8px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-weight: 800; 
+            font-size: 0.85rem; 
+            color: #475569;
+        }
+
+        .ranking-item.first .ranking-number { 
+            background: #22c55e; 
+            color: white; 
+        }
+
+        /* Utilitários */
+        .sticky-top-custom {
+            position: sticky;
+            top: 20px;
+            z-index: 100;
+        }
+
+        /* Painel de aprovação */
+        .approval-panel {
+            background: white;
+            border-radius: 16px;
+            border: 2px solid #bbf7d0;
+            box-shadow: 0 4px 20px rgba(22, 163, 74, 0.08);
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+
+        .approval-panel-header {
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid #bbf7d0;
+        }
+
+        .approval-progress {
+            height: 8px;
+            border-radius: 99px;
+            background: #e2e8f0;
+            overflow: hidden;
+        }
+
+        .approval-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #22c55e, #16a34a);
+            transition: width 0.3s;
+        }
+
+        .offer-cell {
+            min-width: 140px;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        .offer-cell input[type="radio"] {
+            transform: scale(1.15);
+            cursor: pointer;
+        }
+
+        .offer-cell.best-offer {
+            background: #f0fdf4;
+        }
+
+        .offer-label {
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: #64748b;
+            margin-bottom: 0.15rem;
+        }
+
+        .offer-price {
+            font-weight: 800;
+            font-size: 1rem;
+            color: #0f172a;
+        }
+
+        .offer-unit-detail {
+            font-size: 0.7rem;
+            color: #94a3b8;
+            margin-top: 0.2rem;
+            line-height: 1.2;
+            word-break: break-word;
+        }
+
+        /* Ajustes visuais específicos para a matriz de aprovação */
+        .approval-panel .table-comparison thead th {
+            padding: 0.75rem 0.75rem !important;
+            vertical-align: middle;
+        }
+
+        .approval-panel .table-comparison tbody td {
+            padding: 0.75rem 0.75rem !important;
+            vertical-align: middle;
+        }
+
+        .approved-row {
+            background: #f0fdf4 !important;
+        }
+
+        .badge-approved {
+            background: #16a34a;
+            color: white;
+            font-size: 0.75rem;
+            padding: 0.35rem 0.65rem;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+
+        tr.row-approved td {
+            border-left: 3px solid #22c55e;
+        }
+
+        .offer-card-body {
+            cursor: pointer;
+            border-radius: 10px;
+            padding: 0.35rem 0.5rem;
+            margin: -0.35rem -0.5rem;
+            transition: background 0.15s, box-shadow 0.15s;
+        }
+
+        .offer-card-body:hover {
+            background: rgba(15, 23, 42, 0.06);
+            box-shadow: inset 0 0 0 1px #cbd5e1;
+        }
+
+        .offer-card-body .offer-hint {
+            font-size: 0.62rem;
+            color: #94a3b8;
+            margin-top: 0.35rem;
+        }
+
+        .offer-cell .form-check-input {
+            position: relative;
+            z-index: 2;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 0.9rem;
+        }
+
+        .detail-row:last-child { border-bottom: none; }
+        .detail-label { color: #64748b; font-weight: 600; }
+        .detail-value { color: #0f172a; font-weight: 700; text-align: right; }
+
+        /* Resumo dos vencedores (pós-aprovação) */
+        .winners-panel {
+            background: white;
+            border-radius: 16px;
+            border: 1px solid #bbf7d0;
+            box-shadow: 0 4px 16px rgba(22, 163, 74, 0.06);
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+
+        .winners-panel-header {
+            background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid #bbf7d0;
+        }
+
+        .winner-card {
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            padding: 1.25rem 1.35rem;
+            background: #fff;
+            height: 100%;
+            border-left: 4px solid #22c55e;
+        }
+
+        .winner-card .fornecedor-nome {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: #15803d;
+        }
+
+        .winner-meta {
+            font-size: 0.8rem;
+            color: #64748b;
+            margin-top: 0.35rem;
+        }
+
+        .winner-meta span {
+            display: block;
+            margin-bottom: 0.15rem;
+        }
+
+        .winner-total {
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: #0f172a;
+            margin-top: 0.75rem;
+        }
+
+        .btn-ver-detalhe {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 99px;
+        }
+
+        @media print { 
+            .no-print { display: none !important; } 
+            .header-gradient { padding: 1rem 0; border-radius: 0; background: white !important; color: black !important; } 
+            .card-comparison { box-shadow: none; border: 1px solid #ddd; break-inside: avoid; }
+            body { background: white; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="header-gradient no-print">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-7">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-2">
+                        <li class="breadcrumb-item"><a href="{{ url_for('painel') }}" class="text-white-50 text-decoration-none">Painel</a></li>
+                        <li class="breadcrumb-item"><a href="{{ url_for('visualizar_cotacao', cotacao_id=cotacao.id) }}" class="text-white-50 text-decoration-none">{{ cotacao.numero }}</a></li>
+                        <li class="breadcrumb-item active text-white" aria-current="page">Análise de Preços</li>
+                    </ol>
+                </nav>
+                <h1 class="display-5 fw-bold mb-1">Comparativo de Fornecedores</h1>
+                <p class="lead opacity-75 mb-2">Análise detalhada de custos, impostos e prazos.</p>
+                {% if cotacao.status == 'EM COTACAO' %}
+                <span class="badge bg-info text-dark">Em cotação</span>
+                {% elif cotacao.status == 'AGUARDANDO APROVACAO' %}
+                <span class="badge bg-warning text-dark">Aguardando aprovação</span>
+                {% elif cotacao.status == 'APROVADO' %}
+                <span class="badge bg-success">Aprovado</span>
+                {% elif cotacao.status == 'REPROVADO' %}
+                <span class="badge bg-danger">Reprovado</span>
+                {% endif %}
+            </div>
+            <div class="col-md-5 text-md-end mt-4 mt-md-0">
+
+                {% if current_user.perfil == 'gestor' and cotacao.status == 'AGUARDANDO APROVACAO' %}
+                <form action="{{ url_for('reprovar_cotacao', cotacao_id=cotacao.id) }}"
+                      method="POST"
+                      class="d-inline">
+                    <button type="submit"
+                            class="btn btn-danger rounded-pill px-4 fw-bold shadow-sm me-2"
+                            onclick="return confirm('Reprovar esta cotação? Esta ação não pode ser desfeita.')">
+                        <i class="bi bi-x-circle-fill me-2"></i>
+                        Reprovar
+                    </button>
+                </form>
+                {% if pode_finalizar %}
+                <form action="{{ url_for('aprovar_cotacao', cotacao_id=cotacao.id) }}"
+                      method="POST"
+                      class="d-inline">
+                    <button type="submit"
+                            class="btn btn-success rounded-pill px-4 fw-bold shadow-sm me-2"
+                            onclick="return confirm('Confirmar aprovação final da cotação?')">
+                        <i class="bi bi-check-circle-fill me-2"></i>
+                        Concluir aprovação
+                    </button>
+                </form>
+                {% endif %}
+                {% elif cotacao.status == 'APROVADO' %}
+                <span class="badge bg-success fs-6 px-3 py-2 me-2">
+                    <i class="bi bi-check-circle-fill me-1"></i> Cotação aprovada
+                </span>
+                {% elif cotacao.status == 'REPROVADO' %}
+                <span class="badge bg-danger fs-6 px-3 py-2 me-2">
+                    <i class="bi bi-x-circle-fill me-1"></i> Cotação reprovada
+                </span>
+                {% endif %}
+
+                <button onclick="window.print()" class="btn btn-light rounded-pill px-4 fw-bold shadow-sm me-2">
+                    <i class="bi bi-printer me-2"></i>Imprimir
+                </button>
+
+                <a href="{{ url_for('visualizar_cotacao', cotacao_id=cotacao.id) }}"
+                   class="btn btn-outline-light rounded-pill px-4">
+                    <i class="bi bi-arrow-left me-2"></i>Voltar
+                </a>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container mb-5">
+    
+    {% if fornecedores_blocos|length == 0 %}
+    <div class="card p-5 text-center border-0 shadow-sm rounded-4">
+        <div class="py-5">
+            <i class="bi bi-clipboard-x display-1 text-muted mb-4"></i>
+            <h3 class="fw-bold">Nenhum dado para comparar</h3>
+            <p class="text-muted fs-5">Parece que os preços ainda não foram lançados para esta cotação.</p>
+            <div class="mt-4">
+                <a href="{{ url_for('visualizar_cotacao', cotacao_id=cotacao.id) }}" class="btn btn-primary btn-lg rounded-pill px-5">Lançar Preços Agora</a>
+            </div>
+        </div>
+    </div>
+    {% else %}
+
+    {% if resultado_vencedores and resultado_vencedores|length > 0 %}
+    <div class="winners-panel mb-4">
+        <div class="winners-panel-header">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+                <div>
+                    <h5 class="fw-bold mb-1 text-success">
+                        <i class="bi bi-trophy-fill me-2"></i>
+                        {% if cotacao.status == 'APROVADO' %}
+                        Cotação aprovada — fornecedores escolhidos
+                        {% else %}
+                        Produtos já aprovados
+                        {% endif %}
+                    </h5>
+                    <p class="text-muted small mb-0">
+                        Somente o fornecedor vencedor de cada item, conforme decisão do gestor.
+                    </p>
+                </div>
+                <div class="text-end">
+                    <div class="text-muted small">Total dos itens aprovados</div>
+                    <div class="fs-4 fw-bold text-success">{{ total_vencedores|moeda_br }}</div>
+                    <div class="text-muted small">(sem rateio de frete entre fornecedores)</div>
+                </div>
+            </div>
+        </div>
+        <div class="p-3 p-md-4">
+            <div class="row g-3">
+                {% for v in resultado_vencedores %}
+                {% set oferta = v.oferta %}
+                {% set item = v.item %}
+                <div class="col-md-6 col-xl-4">
+                    <div class="winner-card">
+                        <div class="d-flex justify-content-between align-items-start gap-2">
+                            <div>
+                                <div class="text-muted small text-uppercase fw-bold" style="font-size:0.65rem;">Produto</div>
+                                <div class="fw-bold text-dark">{{ item.descricao }}</div>
+                                <div class="text-muted small">{{ item.quantidade }} {{ item.unidade or 'un' }}</div>
+                            </div>
+                            <span class="badge-approved"><i class="bi bi-check-lg"></i></span>
+                        </div>
+                        <hr class="my-3 opacity-25">
+                        <div class="fornecedor-nome"><i class="bi bi-shop me-1"></i>{{ oferta.fornecedor_nome }}</div>
+                        <div class="winner-meta">
+                            <span><i class="bi bi-calendar3 me-1"></i>Prazo: {{ oferta.prazo }} dias</span>
+                            <span><i class="bi bi-credit-card me-1"></i>{{ oferta.condicao_pagamento }}</span>
+                            <span><i class="bi bi-percent me-1"></i>ICMS {{ oferta.icms_percent }}% · IPI {{ oferta.ipi_percent }}%</span>
+                            {% if oferta.st > 0 %}<span>ST: {{ oferta.st|moeda_br }}</span>{% endif %}
+                            {% if oferta.desconto > 0 %}<span>Desconto: -{{ oferta.desconto|moeda_br }}</span>{% endif %}
+                        </div>
+                        <div class="winner-total">{{ oferta.custo_total|moeda_br }}</div>
+                        <div class="text-muted small">{{ oferta.valor_unitario|moeda_br }}/un &times; {{ item.quantidade }}</div>
+                        <button type="button"
+                                class="btn btn-outline-success btn-ver-detalhe mt-2 offer-card-body border-0 bg-transparent p-0"
+                                data-oferta='{{ oferta|tojson }}'>
+                            <i class="bi bi-zoom-in"></i> Ver todos os detalhes
+                        </button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if matriz_pendentes and matriz_pendentes|length > 0 and current_user.perfil == 'gestor' and cotacao.status == 'AGUARDANDO APROVACAO' %}
+    <div class="approval-panel no-print mb-4">
+        <div class="approval-panel-header">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+                <div>
+                    <h5 class="fw-bold mb-1 text-success">
+                        <i class="bi bi-clipboard-check-fill me-2"></i>
+                        Aprovação do Gestor
+                    </h5>
+                    <p class="text-muted small mb-0">
+                        {% if resultado_vencedores and resultado_vencedores|length > 0 %}
+                        Aprove os produtos restantes abaixo.
+                        {% else %}
+                        Escolha o fornecedor de cada produto ou marque vários e aprove em lote (fornecedores diferentes).
+                        {% endif %}
+                    </p>
+                </div>
+                <div class="text-end" style="min-width: 200px;">
+                    <div class="fw-bold text-dark mb-1">{{ itens_aprovados }} / {{ total_itens }} produtos</div>
+                    <div class="approval-progress">
+                        <div class="approval-progress-bar"
+                             style="width: {{ (itens_aprovados / total_itens * 100) if total_itens else 0 }}%;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% if current_user.perfil == 'gestor' and cotacao.status == 'AGUARDANDO APROVACAO' %}
+        <form id="form-aprovacao-lote" action="{{ url_for('aprovar_lote', cotacao_id=cotacao.id) }}" method="POST" class="d-none"></form>
+        {% endif %}
+
+        <div class="table-responsive">
+            <table class="table table-comparison mb-0">
+                <thead>
+                    <tr>
+                        {% if current_user.perfil == 'gestor' and cotacao.status == 'AGUARDANDO APROVACAO' %}
+                        <th class="ps-3" style="width: 48px;">
+                            <input type="checkbox" class="form-check-input" id="selecionar-todos"
+                                   title="Selecionar todos para lote">
+                        </th>
+                        {% endif %}
+                        <th class="ps-3">Produto</th>
+                        {% for f in fornecedores_blocos %}
+                        <th class="offer-cell text-center">{{ f.fornecedor.nome }}</th>
+                        {% endfor %}
+                        <th class="text-center">Status</th>
+                        {% if current_user.perfil == 'gestor' and cotacao.status == 'AGUARDANDO APROVACAO' %}
+                        <th class="pe-3 text-end">Ação</th>
+                        {% endif %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for linha in matriz_pendentes %}
+                    {% set item = linha.item %}
+                    <tr data-item-id="{{ item.id }}">
+                        <td class="ps-3 align-middle">
+                            {% if linha.ofertas %}
+                            <input type="checkbox" class="form-check-input cb-lote"
+                                   form="form-aprovacao-lote"
+                                   name="selecao"
+                                   value=""
+                                   data-item-id="{{ item.id }}">
+                            {% endif %}
+                        </td>
+                        <td class="ps-3">
+                            <div class="fw-bold">{{ item.descricao }}</div>
+                            <div class="text-muted small">{{ item.quantidade }} {{ item.unidade or 'un' }}</div>
+                        </td>
+                        {% for f in fornecedores_blocos %}
+                        {% set fid = f.fornecedor.id %}
+                        {% set oferta = linha.ofertas | selectattr('fornecedor_id', 'equalto', fid) | first %}
+                        <td class="offer-cell {% if oferta and linha.melhor_fornecedor_id == fid %}best-offer{% endif %}">
+                            {% if oferta %}
+                            <input type="radio"
+                                   class="form-check-input radio-fornecedor mb-1"
+                                   name="fornecedor_item_{{ item.id }}"
+                                   value="{{ fid }}"
+                                   data-item-id="{{ item.id }}"
+                                   data-selecao="{{ item.id }}:{{ fid }}"
+                                   {% if linha.melhor_fornecedor_id == fid %}checked{% endif %}>
+                            <div class="offer-card-body"
+                                 role="button"
+                                 tabindex="0"
+                                 title="Clique para ver impostos, prazo e condições"
+                                 data-oferta='{{ oferta|tojson }}'>
+                                <div class="offer-label">Custo total</div>
+                                <div class="offer-price">{{ oferta.custo_total|moeda_br }}</div>
+                                <div class="offer-unit-detail">
+                                    {{ oferta.valor_unitario|moeda_br }}/un
+                                    &times; {{ item.quantidade }}
+                                    {{ item.unidade or 'un' }}
+                                </div>
+                                <div class="text-muted small">{{ oferta.prazo }} dias</div>
+                                {% if linha.melhor_fornecedor_id == fid %}
+                                <span class="badge bg-success-subtle text-success border-0 mt-1" style="font-size:0.65rem;">Menor preço</span>
+                                {% endif %}
+                                <div class="offer-hint"><i class="bi bi-zoom-in"></i> Ver detalhes</div>
+                            </div>
+                            {% else %}
+                            <span class="text-muted small">—</span>
+                            {% endif %}
+                        </td>
+                        {% endfor %}
+                        <td class="text-center align-middle">
+                            {% if linha.ofertas %}
+                            <span class="badge bg-warning-subtle text-warning-emphasis">Pendente</span>
+                            {% else %}
+                            <span class="badge bg-secondary-subtle text-secondary">Sem preço</span>
+                            {% endif %}
+                        </td>
+                        <td class="pe-3 text-end align-middle">
+                            {% if linha.ofertas %}
+                            <form action="{{ url_for('aprovar_item', cotacao_id=cotacao.id) }}" method="POST" class="d-inline form-aprovar-item">
+                                <input type="hidden" name="item_id" value="{{ item.id }}">
+                                <input type="hidden" name="fornecedor_id" value="" class="input-fornecedor-id">
+                                <button type="submit" class="btn btn-sm btn-success rounded-pill px-3 fw-bold btn-aprovar-item">
+                                    <i class="bi bi-check2"></i> Aprovar
+                                </button>
+                            </form>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if current_user.perfil == 'gestor' and cotacao.status == 'AGUARDANDO APROVACAO' %}
+        <div class="p-3 border-top bg-light d-flex flex-wrap gap-2 justify-content-between align-items-center">
+            <span class="text-muted small">
+                <i class="bi bi-info-circle me-1"></i>
+                No lote, cada produto usa o fornecedor selecionado no rádio da linha.
+            </span>
+            <button type="submit" form="form-aprovacao-lote"
+                    class="btn btn-primary rounded-pill px-4 fw-bold" id="btn-aprovacao-lote">
+                <i class="bi bi-check2-all me-2"></i>Aprovar selecionados em lote
+            </button>
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <!-- Modal: detalhes da proposta -->
+    <div class="modal fade" id="modalDetalheOferta" tabindex="-1" aria-labelledby="modalDetalheOfertaLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-0 shadow-lg rounded-4">
+                <div class="modal-header border-0 pb-0">
+                    <div>
+                        <h5 class="modal-title fw-bold" id="modalDetalheOfertaLabel">Detalhes da proposta</h5>
+                        <p class="text-muted small mb-0" id="modalDetalheSubtitulo"></p>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body pt-3">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="p-3 rounded-3 bg-light h-100">
+                                <h6 class="fw-bold text-uppercase small text-secondary mb-3">Fornecedor</h6>
+                                <div id="modalFornecedorInfo"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="p-3 rounded-3 bg-light h-100">
+                                <h6 class="fw-bold text-uppercase small text-secondary mb-3">Condições comerciais</h6>
+                                <div id="modalCondicoesInfo"></div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="p-3 rounded-3 border">
+                                <h6 class="fw-bold text-uppercase small text-secondary mb-3">Valores do item (lançados pelo comprador)</h6>
+                                <div id="modalValoresInfo"></div>
+                                <div class="mt-3 pt-3 border-top d-flex justify-content-between align-items-center">
+                                    <span class="fw-bold text-secondary">Custo total do item</span>
+                                    <span class="fs-4 fw-bold text-success" id="modalCustoTotal"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if cotacao.status != 'APROVADO' and not (current_user.perfil == 'gestor' and cotacao.status == 'AGUARDANDO APROVACAO') %}
+    <div class="row">
+        <!-- Coluna Principal -->
+        <div class="col-lg-9">
+            {% for f in fornecedores_blocos %}
+            <div class="card-comparison" id="vendor-{{ loop.index }}">
+                <div class="vendor-header">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="ranking-number {% if loop.first %}bg-success text-white{% endif %}">{{ loop.index }}</div>
+                        <h4 class="vendor-name">{{ f.fornecedor.nome }}</h4>
+                        {% if loop.first %}
+                        <span class="winner-badge"><i class="bi bi-star-fill"></i> Melhor Oferta</span>
+                        {% endif %}
+                    </div>
+                    <div class="text-end d-none d-sm-block">
+                        <span class="text-muted small d-block">Condição de Pagamento</span>
+                        <span class="fw-bold text-dark">{{ f.fornecedor.condicao_pagamento or 'Não informada' }}</span>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-comparison mb-0">
+                        <thead>
+                            <tr>
+                                <th class="ps-4">Produto</th>
+                                <th class="text-center">Qtd</th>
+                                <th>Unitário</th>
+                                <th>Impostos</th>
+                                <th>ST / Desc.</th>
+                                <th class="text-center">Prazo</th>
+                                <th class="pe-4 text-end">Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for i in f.itens %}
+                            <tr class="{% if i.aprovado %}table-success{% endif %}">
+                                <td class="ps-4">
+                                    <div class="fw-bold text-dark">
+                                        {{ i.produto }}
+                                        {% if i.aprovado %}
+                                        <span class="badge-approved ms-1"><i class="bi bi-check-lg"></i></span>
+                                        {% endif %}
+                                    </div>
+                                    <div class="text-muted small">{{ i.unidade }}</div>
+                                </td>
+                                <td class="text-center fw-bold">{{ i.quantidade }}</td>
+                                <td class="price-tag text-nowrap">R$ {{ "%.2f"|format(i.valor_unitario)|replace('.', ',') }}</td>
+                                <td>
+                                    <span class="tax-tag">IPI: {{ "%.2f"|format(i.ipi)|replace('.', ',') }}</span>
+                                    <span class="tax-tag">ICMS: {{ "%.2f"|format(i.icms)|replace('.', ',') }}</span>
+                                </td>
+                                <td>
+                                    {% if i.st > 0 %}<span class="tax-tag text-danger">ST: +{{ "%.2f"|format(i.st)|replace('.', ',') }}</span>{% endif %}
+                                    {% if i.desconto > 0 %}<span class="tax-tag text-success">Desc: -{{ "%.2f"|format(i.desconto)|replace('.', ',') }}</span>{% endif %}
+                                    {% if i.st == 0 and i.desconto == 0 %}<span class="text-muted small">-</span>{% endif %}
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge bg-light text-dark border px-2 py-1">
+                                        {{ i.prazo }} dias
+                                    </span>
+                                </td>
+                                <td class="pe-4 text-end">
+                                    <span class="fw-bold text-dark">R$ {{ "%.2f"|format(i.total)|replace('.', ',') }}</span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="total-row">
+                    <div class="row g-3 align-items-center">
+                        <div class="col-md-3">
+                            <div class="summary-box">
+                                <p class="summary-label">Soma Itens</p>
+                                <p class="summary-value mb-0">R$ {{ "%.2f"|format(f.subtotal_itens)|replace('.', ',') }}</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="summary-box">
+                                <p class="summary-label">Frete</p>
+                                <p class="summary-value mb-0">
+                                    R$ {{ "%.2f"|format(f.frete)|replace('.', ',') }}
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-md-6 text-md-end">
+                            <p class="summary-label mb-1">Custo Total</p>
+                            <h2 class="grand-total mb-0">R$ {{ "%.2f"|format(f.total_geral)|replace('.', ',') }}</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Coluna Lateral -->
+        <div class="col-lg-3 no-print">
+            <div class="sticky-top-custom">
+                <div class="ranking-card mb-4">
+                    <h6 class="fw-bold mb-3 text-uppercase small text-secondary">Ranking de Preços</h6>
+                    {% for f in fornecedores_blocos %}
+                    <a href="#vendor-{{ loop.index }}" class="text-decoration-none">
+                        <div class="ranking-item {% if loop.first %}first{% endif %}">
+                            <div class="ranking-number">{{ loop.index }}</div>
+                            <div class="overflow-hidden">
+                                <div class="fw-bold text-dark text-truncate small">{{ f.fornecedor.nome }}</div>
+                                <div class="{% if loop.first %}text-success{% else %}text-muted{% endif %} fw-bold small">
+                                    R$ {{ "%.2f"|format(f.total_geral)|replace('.', ',') }}
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    {% endif %}
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+(function () {
+    function moedaBr(valor) {
+        const n = Number(valor) || 0;
+        return 'R$ ' + n.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function linhaDetalhe(label, valor) {
+        return '<div class="detail-row"><span class="detail-label">' + label + '</span><span class="detail-value">' + valor + '</span></div>';
+    }
+
+    function abrirModalOferta(oferta) {
+        const modalEl = document.getElementById('modalDetalheOferta');
+        if (!modalEl || !oferta) return;
+
+        document.getElementById('modalDetalheSubtitulo').textContent =
+            oferta.item_descricao + ' · ' + oferta.quantidade + ' ' + (oferta.item_unidade || 'un');
+
+        let fornecedorHtml = linhaDetalhe('Nome', oferta.fornecedor_nome);
+        if (oferta.fornecedor_contato) fornecedorHtml += linhaDetalhe('Contato', oferta.fornecedor_contato);
+        if (oferta.fornecedor_telefone) fornecedorHtml += linhaDetalhe('Telefone', oferta.fornecedor_telefone);
+        if (oferta.fornecedor_email) fornecedorHtml += linhaDetalhe('E-mail', oferta.fornecedor_email);
+        document.getElementById('modalFornecedorInfo').innerHTML = fornecedorHtml;
+
+        document.getElementById('modalCondicoesInfo').innerHTML =
+            linhaDetalhe('Condição de pagamento', oferta.condicao_pagamento) +
+            linhaDetalhe('Frete total do fornecedor', moedaBr(oferta.frete_total)) +
+            linhaDetalhe('Prazo de entrega (item)', (oferta.prazo || 0) + ' dias');
+
+        document.getElementById('modalValoresInfo').innerHTML =
+            linhaDetalhe('Valor unitário', moedaBr(oferta.valor_unitario)) +
+            linhaDetalhe('Quantidade', oferta.quantidade + ' ' + (oferta.item_unidade || 'un')) +
+            linhaDetalhe('Subtotal (sem impostos)', moedaBr(oferta.subtotal)) +
+            linhaDetalhe('ICMS (' + (oferta.icms_percent || 0) + '%)', moedaBr(oferta.icms)) +
+            linhaDetalhe('IPI (' + (oferta.ipi_percent || 0) + '%)', moedaBr(oferta.ipi)) +
+            linhaDetalhe('ST', moedaBr(oferta.st)) +
+            linhaDetalhe('Desconto', '- ' + moedaBr(oferta.desconto));
+
+        document.getElementById('modalCustoTotal').textContent = moedaBr(oferta.custo_total);
+
+        bootstrap.Modal.getOrCreateInstance(modalEl).show();
+    }
+
+    document.querySelectorAll('.offer-card-body').forEach(function (card) {
+        card.addEventListener('click', function (e) {
+            if (e.target.closest('.form-check-input')) return;
+            try {
+                abrirModalOferta(JSON.parse(card.dataset.oferta));
+            } catch (err) {
+                console.error(err);
+            }
+        });
+        card.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                card.click();
+            }
+        });
+    });
+
+    const formLote = document.getElementById('form-aprovacao-lote');
+    if (!formLote) return;
+
+    function fornecedorSelecionado(itemId) {
+        const radio = document.querySelector('input[name="fornecedor_item_' + itemId + '"]:checked');
+        return radio ? radio.value : null;
+    }
+
+    function atualizarCheckboxLote(cb) {
+        const itemId = cb.dataset.itemId;
+        const fid = fornecedorSelecionado(itemId);
+        if (fid && !cb.disabled) {
+            cb.value = itemId + ':' + fid;
+            cb.disabled = false;
+        } else if (!cb.checked) {
+            cb.value = '';
+        }
+    }
+
+    document.querySelectorAll('.radio-fornecedor').forEach(function (radio) {
+        radio.addEventListener('change', function () {
+            const itemId = this.dataset.itemId;
+            const cb = document.querySelector('.cb-lote[data-item-id="' + itemId + '"]');
+            if (cb && !cb.hasAttribute('data-was-approved')) {
+                atualizarCheckboxLote(cb);
+            }
+        });
+    });
+
+    document.querySelectorAll('.cb-lote').forEach(function (cb) {
+        atualizarCheckboxLote(cb);
+        cb.addEventListener('change', function () {
+            if (this.checked) atualizarCheckboxLote(this);
+        });
+    });
+
+    const selecionarTodos = document.getElementById('selecionar-todos');
+    if (selecionarTodos) {
+        selecionarTodos.addEventListener('change', function () {
+            document.querySelectorAll('.cb-lote:not(:disabled)').forEach(function (cb) {
+                cb.checked = selecionarTodos.checked;
+                if (cb.checked) atualizarCheckboxLote(cb);
+            });
+        });
+    }
+
+    document.querySelectorAll('.form-aprovar-item').forEach(function (form) {
+        form.addEventListener('submit', function (e) {
+            const itemId = form.querySelector('input[name="item_id"]').value;
+            const fid = fornecedorSelecionado(itemId);
+            if (!fid) {
+                e.preventDefault();
+                alert('Selecione o fornecedor para este produto antes de aprovar.');
+                return;
+            }
+            form.querySelector('.input-fornecedor-id').value = fid;
+        });
+    });
+
+    formLote.addEventListener('submit', function (e) {
+        document.querySelectorAll('.cb-lote:checked').forEach(atualizarCheckboxLote);
+        const marcados = formLote.querySelectorAll('.cb-lote:checked');
+        if (marcados.length === 0) {
+            e.preventDefault();
+            alert('Marque ao menos um produto para aprovar em lote.');
+            return;
+        }
+        let invalido = false;
+        marcados.forEach(function (cb) {
+            if (!cb.value || cb.value.indexOf(':') < 0) invalido = true;
+        });
+        if (invalido) {
+            e.preventDefault();
+            alert('Selecione o fornecedor (rádio) em cada linha marcada antes de aprovar em lote.');
+        }
+    });
+})();
+</script>
+</body>
+</html>

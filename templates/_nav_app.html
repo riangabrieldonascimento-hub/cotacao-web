@@ -1,0 +1,32 @@
+<nav class="navbar navbar-expand-lg navbar-dark navbar-premium">
+    <div class="container">
+        <a class="navbar-brand" href="{{ url_for('painel') }}">
+            <i class="bi bi-box-seam-fill text-primary me-2"></i>COTAÇÃO<span class="text-primary">WEB</span>
+        </a>
+        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navMain">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navMain">
+            <ul class="navbar-nav me-auto ms-lg-3 gap-lg-1">
+                <li class="nav-item">
+                    <a class="nav-link {% if nav_ativo == 'painel' %}active fw-bold text-white{% else %}text-white-50{% endif %}"
+                       href="{{ url_for('painel') }}">
+                        <i class="bi bi-grid me-1"></i> Cotações
+                    </a>
+                </li>
+                {% if current_user.is_authenticated and current_user.perfil == 'gestor' %}
+                <li class="nav-item">
+                    <a class="nav-link {% if nav_ativo == 'usuarios' %}active fw-bold text-white{% else %}text-white-50{% endif %}"
+                       href="{{ url_for('listar_usuarios') }}">
+                        <i class="bi bi-people me-1"></i> Usuários
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+            <div class="d-flex align-items-center gap-2 py-2 py-lg-0">
+                <span class="text-white-50 small"><i class="bi bi-person me-1"></i> {{ current_user.usuario }}</span>
+                <a href="{{ url_for('logout') }}" class="btn btn-outline-light btn-sm rounded-pill px-3">Sair</a>
+            </div>
+        </div>
+    </div>
+</nav>
