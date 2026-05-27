@@ -145,6 +145,15 @@
             font-weight: 600;
             font-size: 0.85rem;
         }
+
+        .filters-card {
+            background: white;
+            border: 1px solid var(--slate-200);
+            border-radius: 14px;
+            padding: 1rem;
+            margin-bottom: 1.2rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+        }
     </style>
 </head>
 <body>
@@ -164,6 +173,54 @@
                 <i class="bi bi-plus-lg me-2"></i>NOVA COTAÇÃO
             </a>
         </div>
+    </div>
+
+    <div class="filters-card">
+        <form method="GET" action="{{ url_for('painel') }}">
+            <div class="row g-2 align-items-center">
+                <div class="col-lg-4 col-md-6">
+                    <div class="input-group">
+                        <span class="input-group-text bg-light"><i class="bi bi-search"></i></span>
+                        <input type="text"
+                               class="form-control"
+                               name="q"
+                               value="{{ filtro_q or '' }}"
+                               placeholder="Buscar por número, solicitante ou finalidade">
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-3">
+                    <select class="form-select" name="status">
+                        <option value="">Todos os status</option>
+                        <option value="EM COTACAO" {% if filtro_status == 'EM COTACAO' %}selected{% endif %}>Em cotação</option>
+                        <option value="AGUARDANDO APROVACAO" {% if filtro_status == 'AGUARDANDO APROVACAO' %}selected{% endif %}>Aguardando aprovação</option>
+                        <option value="APROVADO" {% if filtro_status == 'APROVADO' %}selected{% endif %}>Aprovado</option>
+                        <option value="REPROVADO" {% if filtro_status == 'REPROVADO' %}selected{% endif %}>Reprovado</option>
+                    </select>
+                </div>
+                <div class="col-lg-2 col-md-3">
+                    <input type="date"
+                           class="form-control"
+                           name="data_inicio"
+                           value="{{ filtro_data_inicio or '' }}"
+                           title="Data inicial">
+                </div>
+                <div class="col-lg-2 col-md-3">
+                    <input type="date"
+                           class="form-control"
+                           name="data_fim"
+                           value="{{ filtro_data_fim or '' }}"
+                           title="Data final">
+                </div>
+                <div class="col-lg-2 col-md-12 d-grid d-md-flex gap-2">
+                    <button type="submit" class="btn btn-dark w-100">
+                        <i class="bi bi-funnel me-1"></i> Filtrar
+                    </button>
+                    <a href="{{ url_for('painel') }}" class="btn btn-outline-secondary w-100">
+                        Limpar
+                    </a>
+                </div>
+            </div>
+        </form>
     </div>
 
     <!-- Cabeçalho das Colunas -->

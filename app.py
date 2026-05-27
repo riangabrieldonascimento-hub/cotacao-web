@@ -10,6 +10,7 @@ from flask_login import (
 )
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
+from sqlalchemy import or_
 import os
 
 # =====================================
@@ -363,8 +364,73 @@ def logout():
 @app.route('/painel')
 @login_required
 def painel():
-    cotacoes = Cotacao.query.order_by(Cotacao.id.desc()).all()
-    return render_template('painel.html', usuario=current_user, cotacoes=cotacoes)
+    busca = (request.args.get('q') or '').strip()
+    status = (request.args.get('status') or '').strip().upper()
+    data_inicio_raw = (request.args.get('data_inicio') or '').strip()
+    data_fim_raw = (request.args.get('data_fim') or '').strip()
+
+    query = Cotacao.query
+
+    if busca:
+        termo = f"%{busca}%"
+        query = query.filter(
+            or_(
+                Cotacao.numero.ilike(termo),
+                Cotacao.solicitante.ilike(termo),
+                Cotacao.finalidade.ilike(termo),
+            )
+        )
+
+    status_validos = {
+        STATUS_EM_COTACAO,
+        STATUS_AGUARDANDO_APROVACAO,
+        STATUS_APROVADO,
+        STATUS_REPROVADO,
+    }
+    if status in status_validos:
+        query = query.filter(Cotacao.status == status)
+    else:
+        status = ''
+
+    data_inicio = None
+    data_fim = None
+    try:
+        if data_inicio_raw:
+            data_inicio = datetime.strptime(data_inicio_raw, '%Y-%m-%d')
+            query = query.filter(Cotacao.data_criacao >= data_inicio)
+    except ValueError:
+        data_inicio_raw = ''
+        flash('Data inicial inválida. Use o formato correto.', 'warning')
+
+    try:
+        if data_fim_raw:
+            data_fim = datetime.strptime(data_fim_raw, '%Y-%m-%d')
+            fim_dia = data_fim.replace(hour=23, minute=59, second=59, microsecond=999999)
+            query = query.filter(Cotacao.data_criacao <= fim_dia)
+    except ValueError:
+        data_fim_raw = ''
+        flash('Data final inválida. Use o formato correto.', 'warning')
+
+    if data_inicio and data_fim and data_inicio > data_fim:
+        flash('A data inicial não pode ser maior que a data final.', 'warning')
+        return redirect(url_for(
+            'painel',
+            q=busca,
+            status=status,
+            data_inicio=data_inicio_raw,
+            data_fim='',
+        ))
+
+    cotacoes = query.order_by(Cotacao.id.desc()).all()
+    return render_template(
+        'painel.html',
+        usuario=current_user,
+        cotacoes=cotacoes,
+        filtro_q=busca,
+        filtro_status=status,
+        filtro_data_inicio=data_inicio_raw,
+        filtro_data_fim=data_fim_raw,
+    )
 
 
 def _exigir_gestor():

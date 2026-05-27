@@ -715,7 +715,33 @@
         </div>
     </div>
 
-    {% if cotacao.status != 'APROVADO' and not (current_user.perfil == 'gestor' and cotacao.status == 'AGUARDANDO APROVACAO') %}
+    {% if not (current_user.perfil == 'gestor' and cotacao.status == 'AGUARDANDO APROVACAO') %}
+    {% if cotacao.status == 'APROVADO' %}
+    <div class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden">
+        <div class="accordion" id="accordionConsultaPropostas">
+            <div class="accordion-item border-0">
+                <h2 class="accordion-header" id="headingConsultaPropostas">
+                    <button class="accordion-button collapsed fw-bold text-secondary"
+                            type="button"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#collapseConsultaPropostas"
+                            aria-expanded="false"
+                            aria-controls="collapseConsultaPropostas">
+                        <i class="bi bi-search me-2"></i>Consulta das demais propostas
+                    </button>
+                </h2>
+                <div id="collapseConsultaPropostas"
+                     class="accordion-collapse collapse"
+                     aria-labelledby="headingConsultaPropostas"
+                     data-bs-parent="#accordionConsultaPropostas">
+                    <div class="accordion-body pt-2">
+                        <p class="text-muted small mb-0">Comparativo completo de todos os fornecedores para auditoria e conferência.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
     <div class="row">
         <!-- Coluna Principal -->
         <div class="col-lg-9">
