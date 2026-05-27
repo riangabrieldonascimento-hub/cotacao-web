@@ -190,6 +190,15 @@
             </div>
             <div class="col-md-5 text-md-end mt-4 mt-md-0">
                 <div class="d-flex flex-wrap justify-content-md-end gap-2">
+                    {% if current_user.perfil == 'gestor' and cotacao.status == 'APROVADO' %}
+                    <form action="{{ url_for('retornar_para_aguardando', cotacao_id=cotacao.id) }}" method="POST">
+                        <button type="submit"
+                                class="btn btn-outline-warning btn-action"
+                                onclick="return confirm('Retornar esta cotação para Aguardando aprovação?')">
+                            <i class="bi bi-arrow-counterclockwise"></i> Retornar etapa
+                        </button>
+                    </form>
+                    {% endif %}
                     <a href="{{ url_for('comparativo', cotacao_id=cotacao.id) }}" class="btn btn-warning btn-action shadow-sm text-dark">
                         <i class="bi bi-graph-up-arrow"></i> Comparativo Final
                     </a>
