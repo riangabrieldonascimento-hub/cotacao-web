@@ -671,7 +671,15 @@ def retornar_para_aguardando(cotacao_id):
         return redirect(url_for('visualizar_cotacao', cotacao_id=cotacao.id))
 
     # =====================================
-    # VOLTAR PARA AGUARDANDO APROVAÇÃO
+    # REMOVE APROVAÇÕES
+    # =====================================
+
+    AprovacaoItem.query.filter_by(
+        cotacao_id=cotacao.id
+    ).delete()
+
+    # =====================================
+    # VOLTA STATUS
     # =====================================
 
     cotacao.status = STATUS_AGUARDANDO_APROVACAO
@@ -679,7 +687,7 @@ def retornar_para_aguardando(cotacao_id):
     db.session.commit()
 
     flash(
-        'Cotação retornada para Aguardando Aprovação.',
+        'Cotação retornada para aguardando aprovação.',
         'success'
     )
 
