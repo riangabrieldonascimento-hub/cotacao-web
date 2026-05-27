@@ -599,8 +599,6 @@ def nova_cotacao():
 @login_required
 def visualizar_cotacao(cotacao_id):
     cotacao = Cotacao.query.get_or_404(cotacao_id)
-    sincronizar_status_aprovacao(cotacao)
-    db.session.refresh(cotacao)
     resultado_vencedores, total_vencedores = obter_resultado_aprovacao(cotacao)
     return render_template(
         'visualizar_cotacao.html',
@@ -651,7 +649,7 @@ def retornar_para_aguardando(cotacao_id):
         flash('Apenas gestores podem alterar este status.', 'danger')
         return redirect(url_for('visualizar_cotacao', cotacao_id=cotacao.id))
 
-    if cotacao.status != STATUS_APROVADO:
+    if normalizar_status(cotacao.status) != STATUS_APROVADO:
         flash('Somente cotações aprovadas podem retornar para aguardando aprovação.', 'warning')
         return redirect(url_for('visualizar_cotacao', cotacao_id=cotacao.id))
 
