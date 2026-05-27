@@ -644,18 +644,45 @@ def reabrir_cotacao(cotacao_id):
 @app.route('/cotacao/<int:cotacao_id>/retornar-aguardando', methods=['POST'])
 @login_required
 def retornar_para_aguardando(cotacao_id):
+
     cotacao = Cotacao.query.get_or_404(cotacao_id)
+
+    # =====================================
+    # SOMENTE GESTOR
+    # =====================================
+
     if current_user.perfil != 'gestor':
         flash('Apenas gestores podem alterar este status.', 'danger')
         return redirect(url_for('visualizar_cotacao', cotacao_id=cotacao.id))
 
-    if normalizar_status(cotacao.status) != STATUS_APROVADO:
-        flash('Somente cotações aprovadas podem retornar para aguardando aprovação.', 'warning')
+    # =====================================
+    # SOMENTE APROVADAS
+    # =====================================
+
+    status_atual = normalizar_status(cotacao.status)
+
+    if status_atual != STATUS_APROVADO:
+
+        flash(
+            f'Esta cotação não está aprovada. Status atual: {status_atual}',
+            'warning'
+        )
+
         return redirect(url_for('visualizar_cotacao', cotacao_id=cotacao.id))
 
+    # =====================================
+    # VOLTAR PARA AGUARDANDO APROVAÇÃO
+    # =====================================
+
     cotacao.status = STATUS_AGUARDANDO_APROVACAO
+
     db.session.commit()
-    flash('Cotação retornada para Aguardando aprovação.', 'info')
+
+    flash(
+        'Cotação retornada para Aguardando Aprovação.',
+        'success'
+    )
+
     return redirect(url_for('comparativo', cotacao_id=cotacao.id))
 
 
