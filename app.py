@@ -795,10 +795,71 @@ def reprovar_cotacao(cotacao_id):
 @app.route('/cotacao/<int:cotacao_id>/excluir', methods=['POST'])
 @login_required
 def excluir_cotacao(cotacao_id):
+
     cotacao = Cotacao.query.get_or_404(cotacao_id)
-    db.session.delete(cotacao)
-    db.session.commit()
-    flash('Cotação excluída com sucesso.', 'warning')
+
+    try:
+
+        # =====================================
+        # EXCLUIR APROVAÇÕES
+        # =====================================
+
+        aprovacoes = AprovacaoItem.query.filter_by(
+            cotacao_id=cotacao.id
+        ).all()
+
+        for aprovacao in aprovacoes:
+            db.session.delete(aprovacao)
+
+        # =====================================
+        # EXCLUIR PREÇOS
+        # =====================================
+
+        for fornecedor in cotacao.fornecedores:
+
+            precos = PrecoFornecedor.query.filter_by(
+                fornecedor_id=fornecedor.id
+            ).all()
+
+            for preco in precos:
+                db.session.delete(preco)
+
+        # =====================================
+        # EXCLUIR FORNECEDORES
+        # =====================================
+
+        for fornecedor in cotacao.fornecedores:
+            db.session.delete(fornecedor)
+
+        # =====================================
+        # EXCLUIR ITENS
+        # =====================================
+
+        for item in cotacao.itens:
+            db.session.delete(item)
+
+        # =====================================
+        # EXCLUIR COTAÇÃO
+        # =====================================
+
+        db.session.delete(cotacao)
+
+        # =====================================
+        # SALVAR
+        # =====================================
+
+        db.session.commit()
+
+        flash('Cotação excluída com sucesso.', 'success')
+
+    except Exception as e:
+
+        db.session.rollback()
+
+        print(f'ERRO AO EXCLUIR COTAÇÃO: {e}')
+
+        flash('Erro ao excluir cotação.', 'danger')
+
     return redirect(url_for('painel'))
 
 # =====================================
